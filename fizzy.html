@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frizz Hair Calculator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(45deg, #ff8a00, #ff2070);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        body {
+            min-height: 100vh;
+            background: url('back.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%);
+            z-index: -1;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: var(--card-border);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: fadeInUp 0.8s;
+        }
+        
+        .card-header {
+            background: var(--primary-gradient);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(30deg);
+            animation: shine 3s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { transform: rotate(30deg) translateX(-100%); }
+            100% { transform: rotate(30deg) translateX(100%); }
+        }
+        
+        .card-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .frizz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+        
+        .frizz-option {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .frizz-option::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: -1;
+        }
+        
+        .frizz-option:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .frizz-option.active {
+            transform: translateY(-10px) scale(1.05);
+            border-color: #ff8a00;
+            box-shadow: 0 0 0 5px rgba(255, 138, 0, 0.3);
+        }
+        
+        .frizz-option.active::after {
+            opacity: 0.3;
+        }
+        
+        .frizz-percentage {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .frizz-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+        }
+        
+        .btn-submit {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 15px;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 138, 0, 0.6);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .btn-submit:hover::after {
+            transform: translateX(100%);
+        }
+        
+        @media (max-width: 768px) {
+            .card-title {
+                font-size: 2.5rem;
+            }
+            
+            .frizz-percentage {
+                font-size: 1.8rem;
+            }
+            
+            .btn-submit {
+                font-size: 1.5rem;
+                padding: 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    
+    <div class="container py-5">
+        <br>
+         <br>
+          <br>
+           <br>
+            <br>
+             <br>
+             <br>
+         <br>
+          <br>
+           <br>
+            <br>
+             <br><br>
+         <br>
+          <br>
+           <br>
+            <br>
+            <br>
+         <br>
+          <br>
+           <br>
+            <br>
+             <br>
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card animate__animated animate__fadeIn">
+                    <div class="card-header text-center">
+                        <h1 class="card-title animate__animated animate__fadeInDown">ஃப்ரிஸ் ஹேர்</h1>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <div class="frizz-options">
+                            <!-- 10% to 50% -->
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="10" data-delay="0.1s">
+                                <div class="frizz-percentage">10%</div>
+                                <div class="frizz-label">Extreme Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="20" data-delay="0.2s">
+                                <div class="frizz-percentage">20%</div>
+                                <div class="frizz-label">Severe Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="30" data-delay="0.3s">
+                                <div class="frizz-percentage">30%</div>
+                                <div class="frizz-label">Very Bad Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="40" data-delay="0.4s">
+                                <div class="frizz-percentage">40%</div>
+                                <div class="frizz-label">Bad Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="50" data-delay="0.5s">
+                                <div class="frizz-percentage">50%</div>
+                                <div class="frizz-label">Moderate Frizz</div>
+                            </div>
+                            
+                            <!-- 60% to 100% -->
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="60" data-delay="0.6s">
+                                <div class="frizz-percentage">60%</div>
+                                <div class="frizz-label">Some Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="70" data-delay="0.7s">
+                                <div class="frizz-percentage">70%</div>
+                                <div class="frizz-label">Mild Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="80" data-delay="0.8s">
+                                <div class="frizz-percentage">80%</div>
+                                <div class="frizz-label">Little Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="90" data-delay="0.9s">
+                                <div class="frizz-percentage">90%</div>
+                                <div class="frizz-label">Minimal Frizz</div>
+                            </div>
+                            <div class="frizz-option animate__animated animate__fadeIn" data-percentage="100" data-delay="1s">
+                                <div class="frizz-percentage">100%</div>
+                                <div class="frizz-label">No Frizz</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="button" class="btn-submit btn-lg" id="submitBtn" disabled>
+                                <span class="d-flex align-items-center justify-content-center">
+                                    <span class="me-2">SUBMIT</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- GSAP for advanced animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate options with delays
+            const options = document.querySelectorAll('.frizz-option');
+            options.forEach(option => {
+                const delay = option.getAttribute('data-delay') || '0s';
+                option.style.animationDelay = delay;
+            });
+            
+            // Selection logic
+            let selectedPercentage = null;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    options.forEach(opt => {
+                        opt.classList.remove('active');
+                        gsap.to(opt, {
+                            scale: 1,
+                            y: 0,
+                            duration: 0.3
+                        });
+                    });
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    gsap.to(this, {
+                        scale: 1.1,
+                        y: -10,
+                        duration: 0.5,
+                        ease: "back.out(1.7)"
+                    });
+                    
+                    // Store selected percentage
+                    selectedPercentage = parseInt(this.getAttribute('data-percentage'));
+                    
+                    // Enable and animate submit button
+                    submitBtn.disabled = false;
+                    gsap.to(submitBtn, {
+                        y: -5,
+                        scale: 1.05,
+                        duration: 0.5,
+                        ease: "back.out(1.7)"
+                    });
+                });
+            });
+
+            // Submit button handler
+            submitBtn.addEventListener('click', function() {
+                if (!selectedPercentage) return;
+                
+                // Disable button during redirect
+                submitBtn.disabled = true;
+                
+                // Animate button click
+                gsap.to(submitBtn, {
+                    scale: 0.95,
+                    duration: 0.2,
+                    yoyo: true,
+                    repeat: 1,
+                    onComplete: function() {
+                        // Redirect based on selection
+                        if (selectedPercentage <= 50) {
+                            window.location.href = "try.html";
+                        } else {
+                            window.location.href = "thankyou.html";
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
